@@ -1,0 +1,43 @@
+#!/bin/sh
+
+
+#EN_5V_USB  gpio501
+
+#GPIO ext init
+if test ! -d "/sys/class/gpio/gpiochip496";
+then
+    echo "Need init ext GPIO chip"
+    echo "mcp23017 0x20" > /sys/bus/i2c/devices/i2c-0/new_device
+fi
+
+if test ! -d "/sys/class/gpio/gpio501";
+then
+    echo "Init GPIO501"
+    echo "501" > /sys/class/gpio/export
+fi
+
+echo "out" > /sys/class/gpio/gpio501/direction
+
+#clear screen
+echo -en "\e[2J"
+
+echo -e "\nInsert FLASH into USB connector and press any key"
+#wait for keypress
+read -n 1 -s -r
+
+echo -e "\nWait 3s for USB power ON\n\n"
+
+#USB power on
+echo "1" > /sys/class/gpio/gpio501/value
+
+sleep 5
+
+if [ -e "/dev/sda" ]
+then
+    echo -e "\n\nTest PASSED\n"
+else
+    echo -e "\n\nTest FAILED\n"
+fi
+
+#USB power off
+echo "0" > /sys/class/gpio/gpio501/value

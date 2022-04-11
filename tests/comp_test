@@ -1,0 +1,125 @@
+#!/bin/sh
+
+#установить напряжение 3В
+#проверить сигналы компараторов
+#установить напряжение 1,5В
+#проверить сигналы компараторов
+#установить напряжение 0,25В
+#проверить сигналы компараторов
+
+
+
+#GPIO14 - ACC_10
+#GPIO16 - ACC_50
+#GPIO15 - EXT_POW
+#GPIO17 - DEFAULT
+
+
+#GPIO ext init
+# if test ! -d "/sys/class/gpio/gpiochip496";
+# then
+#     echo "Need init ext GPIO chip"
+#     echo "mcp23017 0x20" > /sys/bus/i2c/devices/i2c-0/new_device
+# fi
+
+#GPIO init
+
+if test ! -d "/sys/class/gpio/gpio16";
+then
+    echo "Need init GPIO16"
+    echo "16" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio14";
+then
+    echo "Need init GPIO14"
+    echo "14" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio15";
+then
+    echo "Need init GPIO15"
+    echo "15" > /sys/class/gpio/export
+fi
+
+
+#ACC_50
+echo "in" > /sys/class/gpio/gpio16/direction
+#ACC_10
+echo "in" > /sys/class/gpio/gpio14/direction
+#EXT_POW
+echo "in" > /sys/class/gpio/gpio15/direction
+
+#clear screen
+echo -en "\e[2J"
+
+echo -e "Please, connect power supplys to J2 on DKST 64.1 (BAT), set 3V on power supply P1 and press any key"
+echo -e "(see instructions for testing)"
+#wait for keypress
+read -n 1 -s -r
+
+#read signals
+comp50=$(cat /sys/class/gpio/gpio16/value)
+comp10=$(cat /sys/class/gpio/gpio14/value)
+
+#check
+echo "ACC_50 = $comp50"
+echo "ACC_10 = $comp10"
+if [[ "$comp50" == "1" && "$comp10" == "1" ]]
+then
+    echo "Test passed"
+else
+    echo "Test failed"
+fi
+
+echo -e "Please, set 1.5V on power supply P1 and press any key"
+#wait for keypress
+read -n 1 -s -r
+#read signals
+comp50=$(cat /sys/class/gpio/gpio16/value)
+comp10=$(cat /sys/class/gpio/gpio14/value)
+#check
+echo "ACC_50 = $comp50"
+echo "ACC_10 = $comp10"
+if [[ "$comp50" == "0" && "$comp10" == "1" ]]
+then
+    echo "Test passed"
+else
+    echo "Test failed"
+fi
+
+echo -e "Please, set 0.25V on power supply P1 and press any key"
+#wait for keypress
+read -n 1 -s -r
+#read signals
+comp50=$(cat /sys/class/gpio/gpio16/value)
+comp10=$(cat /sys/class/gpio/gpio14/value)
+#check
+echo "ACC_50 = $comp50"
+echo "ACC_10 = $comp10"
+if [[ "$comp50" == "0" && "$comp10" == "0" ]]
+then
+    echo "Test passed"
+else
+    echo "Test failed"
+fi
+
+
+echo -e "Please, turn ON 12V DC (P2), turn OFF main power DKST 64 and press any key"
+#wait for keypress
+read -n 1 -s -r
+#read signals
+ext_pow0=$(cat /sys/class/gpio/gpio15/value)
+echo -e "Please, turn ON main power DKST 64 and press any key"
+#wait for keypress
+read -n 1 -s -r
+#read signals
+ext_pow1=$(cat /sys/class/gpio/gpio15/value)
+#check
+echo "EXT_POW0 = $ext_pow0"
+echo "EXT_POW1 = $ext_pow1"
+if [[ "$ext_pow0" == "0" && "$ext_pow1" == "1" ]]
+then
+    echo "Test passed"
+else
+    echo "Test failed"
+fi
+

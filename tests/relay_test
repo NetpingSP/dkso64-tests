@@ -1,0 +1,158 @@
+#!/bin/sh
+
+#RELAY1 gpio499
+#RELAY2 gpio498
+#RELAY3 gpio497
+#RELAY4 gpio496
+#EN_12V_OUT gpio500
+
+#GPIO ext init
+if test ! -d "/sys/class/gpio/gpiochip496";
+then
+    echo "Need init ext GPIO chip"
+    echo "mcp23017 0x20" > /sys/bus/i2c/devices/i2c-0/new_device
+fi
+
+
+if test ! -d "/sys/class/gpio/gpio496";
+then
+    echo "Need init GPIO496"
+    echo "496" > /sys/class/gpio/export
+fi
+
+if test ! -d "/sys/class/gpio/gpio497";
+then
+    echo "Need init GPIO497"
+    echo "497" > /sys/class/gpio/export
+fi
+
+if test ! -d "/sys/class/gpio/gpio498";
+then
+    echo "Need init GPIO498"
+    echo "498" > /sys/class/gpio/export
+fi
+
+if test ! -d "/sys/class/gpio/gpio499";
+then
+    echo "Need init GPIO499"
+    echo "499" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio500";
+then
+    echo "Init GPIO5500"
+    echo "500" > /sys/class/gpio/export
+fi
+
+#init GPIOs
+echo "out" > /sys/class/gpio/gpio496/direction
+echo "out" > /sys/class/gpio/gpio497/direction
+echo "out" > /sys/class/gpio/gpio498/direction
+echo "out" > /sys/class/gpio/gpio499/direction
+#EN_12V_OUT
+echo "out" > /sys/class/gpio/gpio500/direction
+
+#init relays
+echo "0" > /sys/class/gpio/gpio496/value
+echo "0" > /sys/class/gpio/gpio497/value
+echo "0" > /sys/class/gpio/gpio498/value
+echo "0" > /sys/class/gpio/gpio499/value
+
+#12V ON
+echo "1" > /sys/class/gpio/gpio500/value
+
+#clear screen
+echo -en "\e[2J"
+
+echo -en "\e[3;3f Relay1: OFF"
+echo -en "\e[4;3f Relay2: OFF"
+echo -en "\e[5;3f Relay3: OFF"
+echo -en "\e[6;3f Relay4: OFF"
+R1="0"
+R2="0"
+R3="0"
+R4="0"
+
+echo -en "\e[8;3f Press key:"
+echo -en "\e[9;3f 1 for switching RELAY1"
+echo -en "\e[10;3f 2 for switching RELAY2"
+echo -en "\e[11;3f 3 for switching RELAY3"
+echo -en "\e[12;3f 4 for switching RELAY4"
+echo -en "\e[13;3f 0 for exit from relay test\n"
+
+
+while [ true ]; do
+
+    read -n 1 -s -r i
+
+    if [[ "$i" == "1" ]]
+    then
+        if [[ "$R1" == "0" ]]
+        then
+            R1="1"
+            echo $R1 > /sys/class/gpio/gpio499/value
+            echo -en "\e[3;3f Relay1: ON "
+        else
+            R1="0"
+            echo $R1 > /sys/class/gpio/gpio499/value
+            echo -en "\e[3;3f Relay1: OFF"
+        fi
+    fi
+
+    if [[ "$i" == "2" ]]
+    then
+        if [[ "$R2" == "0" ]]
+        then
+            R2="1"
+            echo $R2 > /sys/class/gpio/gpio498/value
+            echo -en "\e[4;3f Relay2: ON "
+        else
+            R2="0"
+            echo $R2 > /sys/class/gpio/gpio498/value
+            echo -en "\e[4;3f Relay2: OFF"
+        fi
+    fi
+
+    if [[ "$i" == "3" ]]
+    then
+        if [[ "$R3" == "0" ]]
+        then
+            R3="1"
+            echo $R3 > /sys/class/gpio/gpio497/value
+            echo -en "\e[5;3f Relay3: ON "
+        else
+            R3="0"
+            echo $R3 > /sys/class/gpio/gpio497/value
+            echo -en "\e[5;3f Relay3: OFF"
+        fi
+    fi
+    
+    if [[ "$i" == "4" ]]
+    then
+        if [[ "$R4" == "0" ]]
+        then
+            R4="1"
+            echo $R4 > /sys/class/gpio/gpio496/value
+            echo -en "\e[6;3f Relay4: ON "
+        else
+            R4="0"
+            echo $R4 > /sys/class/gpio/gpio496/value
+            echo -en "\e[6;3f Relay4: OFF"
+        fi
+    fi
+
+    if [[ "$i" == "0" ]]
+    then
+        break
+    fi
+
+done
+
+#clear screen
+echo -en "\e[2J"
+#init relays
+echo "0" > /sys/class/gpio/gpio496/value
+echo "0" > /sys/class/gpio/gpio497/value
+echo "0" > /sys/class/gpio/gpio498/value
+echo "0" > /sys/class/gpio/gpio499/value
+#12V OFF
+echo "0" > /sys/class/gpio/gpio500/value

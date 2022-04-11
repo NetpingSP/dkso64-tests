@@ -1,0 +1,295 @@
+#!/bin/sh
+
+
+#OUT_UP1    gpio510
+#OUT_DOWN1  gpio511
+#OUT_UP2    gpio508
+#OUT_DOWN2  gpio509
+#OUT_UP3    gpio506
+#OUT_DOWN3  gpio507
+#OUT_UP4    gpio504
+#OUT_DOWN4  gpio505
+#IN1        gpio0
+#IN2        gpio1
+#IN3        gpio2
+#IN4        gpio3
+#IN_OE      gpio23
+#EN_12V_OUT gpio500
+#
+
+
+#GPIO ext init
+if test ! -d "/sys/class/gpio/gpiochip496";
+then
+    echo "Need init ext GPIO chip"
+    echo "mcp23017 0x20" > /sys/bus/i2c/devices/i2c-0/new_device
+fi
+
+#GPIO init
+if test ! -d "/sys/class/gpio/gpio500";
+then
+    echo "Init GPIO5500"
+    echo "500" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio504";
+then
+    echo "Init GPIO5504"
+    echo "504" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio505";
+then
+    echo "Init GPIO505"
+    echo "505" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio506";
+then
+    echo "Init GPIO506"
+    echo "506" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio507";
+then
+    echo "Init GPIO507"
+    echo "507" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio508";
+then
+    echo "Init GPIO508"
+    echo "508" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio509";
+then
+    echo "Init GPIO509"
+    echo "509" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio510";
+then
+    echo "Init GPIO510"
+    echo "510" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio511";
+then
+    echo "Init GPIO511"
+    echo "511" > /sys/class/gpio/export
+fi
+
+if test ! -d "/sys/class/gpio/gpio0";
+then
+    echo "Init GPIO0"
+    echo "0" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio1";
+then
+    echo "Init GPIO1"
+    echo "1" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio2";
+then
+    echo "Init GPIO2"
+    echo "2" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio3";
+then
+    echo "Init GPIO3"
+    echo "3" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio23";
+then
+    echo "Init GPIO23"
+    echo "23" > /sys/class/gpio/export
+fi
+
+#IN1
+echo "in" > /sys/class/gpio/gpio0/direction
+#IN2
+echo "in" > /sys/class/gpio/gpio1/direction
+#IN3
+echo "in" > /sys/class/gpio/gpio2/direction
+#IN4
+echo "in" > /sys/class/gpio/gpio3/direction
+#IN_OE
+echo "out" > /sys/class/gpio/gpio23/direction
+#OUT_UP1
+echo "out" > /sys/class/gpio/gpio510/direction
+#OUT_DOWN1
+echo "out" > /sys/class/gpio/gpio511/direction
+#OUT_UP2
+echo "out" > /sys/class/gpio/gpio508/direction
+#OUT_DOWN2
+echo "out" > /sys/class/gpio/gpio509/direction
+#OUT_UP3
+echo "out" > /sys/class/gpio/gpio506/direction
+#OUT_DOWN3
+echo "out" > /sys/class/gpio/gpio507/direction
+#OUT_UP4
+echo "out" > /sys/class/gpio/gpio504/direction
+#OUT_DOWN4
+echo "out" > /sys/class/gpio/gpio505/direction
+#EN_12V_OUT
+echo "out" > /sys/class/gpio/gpio500/direction
+
+
+#IN_OE init
+echo "0" > /sys/class/gpio/gpio23/value
+#OUT1
+echo "0" > /sys/class/gpio/gpio510/value
+echo "0" > /sys/class/gpio/gpio511/value
+#OUT2
+echo "0" > /sys/class/gpio/gpio508/value
+echo "0" > /sys/class/gpio/gpio509/value
+#OUT3
+echo "0" > /sys/class/gpio/gpio506/value
+echo "0" > /sys/class/gpio/gpio507/value
+#OUT4
+echo "0" > /sys/class/gpio/gpio504/value
+echo "0" > /sys/class/gpio/gpio505/value
+
+#12V ON
+echo "1" > /sys/class/gpio/gpio500/value
+
+O1="0"
+O2="0"
+O3="0"
+O4="0"
+
+echo -e "Connect testers to J10, J11 and"
+echo -e "press any key"
+#wait for keypress
+read -n 1 -s -r
+
+
+#clear screen
+echo -en "\e[2J"
+
+echo -en "\e[3;3f OUT1: 0"
+echo -en "\e[4;3f OUT2: 0"
+echo -en "\e[5;3f OUT3: 0"
+echo -en "\e[6;3f OUT4: 0"
+
+echo -en "\e[8;3f Press key:"
+echo -en "\e[9;3f \"1\" for switching OUT1"
+echo -en "\e[10;3f \"2\" for switching OUT2"
+echo -en "\e[11;3f \"3\" for switching OUT3"
+echo -en "\e[12;3f \"4\" for switching OUT4"
+echo -en "\e[13;3f \"0\" for exit from OUTPUT test\n"
+
+
+while [ true ]; do
+    read -n 1 -s -r i
+
+    if [[ "$i" == "1" ]]
+    then
+        if [[ "$O1" == "0" ]]
+        then
+            O1="1"
+            echo "1" > /sys/class/gpio/gpio510/value
+            echo "0" > /sys/class/gpio/gpio511/value
+            echo -en "\e[3;3f OUT1: 1 "
+        else
+            O1="0"
+            echo "0" > /sys/class/gpio/gpio510/value
+            echo "1" > /sys/class/gpio/gpio511/value
+            echo -en "\e[3;3f OUT1: 0 "
+        fi
+    fi
+
+    if [[ "$i" == "2" ]]
+    then
+        if [[ "$O2" == "0" ]]
+        then
+            O2="1"
+            echo "1" > /sys/class/gpio/gpio508/value
+            echo "0" > /sys/class/gpio/gpio509/value
+            echo -en "\e[4;3f OUT2: 1 "
+        else
+            O2="0"
+            echo "0" > /sys/class/gpio/gpio508/value
+            echo "1" > /sys/class/gpio/gpio509/value
+            echo -en "\e[4;3f OUT2: 0 "
+        fi
+    fi
+
+    if [[ "$i" == "3" ]]
+    then
+        if [[ "$O3" == "0" ]]
+        then
+            O3="1"
+            echo "1" > /sys/class/gpio/gpio506/value
+            echo "0" > /sys/class/gpio/gpio507/value
+            echo -en "\e[5;3f OUT3: 1 "
+        else
+            O3="0"
+            echo "0" > /sys/class/gpio/gpio506/value
+            echo "1" > /sys/class/gpio/gpio507/value
+            echo -en "\e[5;3f OUT3: 0 "
+        fi
+    fi
+
+    if [[ "$i" == "4" ]]
+    then
+        if [[ "$O4" == "0" ]]
+        then
+            O4="1"
+            echo "1" > /sys/class/gpio/gpio504/value
+            echo "0" > /sys/class/gpio/gpio505/value
+            echo -en "\e[6;3f OUT4: 1 "
+        else
+            O4="0"
+            echo "0" > /sys/class/gpio/gpio504/value
+            echo "1" > /sys/class/gpio/gpio505/value
+            echo -en "\e[6;3f OUT4: 0 "
+        fi
+    fi
+
+    if [[ "$i" == "0" ]]
+    then
+#clear screen
+        echo -en "\e[2J"
+        break
+    fi
+
+done
+
+
+#Test INPUTS
+
+#clear screen
+echo -en "\e[2J"
+
+echo -en "\e[8;3f Press key \"0\" for exit from INPUT test\n"
+i="1"
+
+while [ true ]; do
+    read -t 1 -n 1 -s -r i
+    
+    echo -en "\e[3;3f IN1: "; cat /sys/class/gpio/gpio0/value
+    echo -en "\e[4;3f IN2: "; cat /sys/class/gpio/gpio1/value
+    echo -en "\e[5;3f IN3: "; cat /sys/class/gpio/gpio2/value
+    echo -en "\e[6;3f IN4: "; cat /sys/class/gpio/gpio3/value
+
+
+    if [[ "$i" == "0" ]]
+    then
+        break
+    fi
+done
+
+#clear screen
+echo -en "\e[2J"
+
+#IN_OE
+echo "1" > /sys/class/gpio/gpio23/value
+#OUT1
+echo "0" > /sys/class/gpio/gpio510/value
+echo "0" > /sys/class/gpio/gpio511/value
+#OUT2
+echo "0" > /sys/class/gpio/gpio508/value
+echo "0" > /sys/class/gpio/gpio509/value
+#OUT3
+echo "0" > /sys/class/gpio/gpio506/value
+echo "0" > /sys/class/gpio/gpio507/value
+#OUT4
+echo "0" > /sys/class/gpio/gpio504/value
+echo "0" > /sys/class/gpio/gpio505/value
+
+#12V OFF
+echo "0" > /sys/class/gpio/gpio500/value

@@ -1,0 +1,133 @@
+#!/bin/sh
+
+
+#EN_12V_OUT gpio500
+#EN_5V_OUT  gpio502
+#EN_5V_USB  gpio501
+
+#GPIO ext init
+if test ! -d "/sys/class/gpio/gpiochip496";
+then
+    echo "Need init ext GPIO chip"
+    echo "mcp23017 0x20" > /sys/bus/i2c/devices/i2c-0/new_device
+fi
+
+
+if test ! -d "/sys/class/gpio/gpio500";
+then
+    echo "Init GPIO500"
+    echo "500" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio501";
+then
+    echo "Init GPIO501"
+    echo "501" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio502";
+then
+    echo "Init GPIO502"
+    echo "502" > /sys/class/gpio/export
+fi
+echo "out" > /sys/class/gpio/gpio500/direction
+echo "out" > /sys/class/gpio/gpio501/direction
+echo "out" > /sys/class/gpio/gpio502/direction
+
+#12V power off
+echo "0" > /sys/class/gpio/gpio500/value
+#5V power off
+echo "0" > /sys/class/gpio/gpio502/value
+#USB power off
+echo "0" > /sys/class/gpio/gpio501/value
+
+O1="0"
+O2="0"
+O3="0"
+
+#clear screen
+echo -en "\e[2J"
+
+echo -en "\e[3;3f 12V: OFF"
+echo -en "\e[4;3f 5V:  OFF"
+echo -en "\e[5;3f USB: OFF"
+
+echo -en "\e[8;3f Press key:"
+echo -en "\e[9;3f \"1\" for switching 12V output power"
+echo -en "\e[10;3f \"2\" for switching 5V output power"
+echo -en "\e[11;3f \"3\" for switching USB output power"
+echo -en "\e[12;3f \"0\" for exit from POWER test\n"
+
+
+while [ true ]; do
+    read -n 1 -s -r i
+
+    if [[ "$i" == "1" ]]
+    then
+        if [[ "$O1" == "0" ]]
+        then
+            O1="1"
+            #12V power on
+            echo "1" > /sys/class/gpio/gpio500/value
+
+            sleep 1
+            echo -en "\e[3;3f 12V: ON  "
+        else
+            O1="0"
+            #12V power off
+            echo "0" > /sys/class/gpio/gpio500/value
+            sleep 1
+            echo -en "\e[3;3f 12V: OFF  "
+        fi
+    fi
+
+    if [[ "$i" == "2" ]]
+    then
+        if [[ "$O2" == "0" ]]
+        then
+            O2="1"
+            #5V power on
+            echo "1" > /sys/class/gpio/gpio502/value
+            sleep 1
+            echo -en "\e[4;3f 5V:  ON  "
+        else
+            O2="0"
+            #5V power off
+            echo "0" > /sys/class/gpio/gpio502/value
+            sleep 1
+            echo -en "\e[4;3f 5V:  OFF  "
+        fi
+    fi
+
+    if [[ "$i" == "3" ]]
+    then
+        if [[ "$O3" == "0" ]]
+        then
+            O3="1"
+            #USB power on
+            echo "1" > /sys/class/gpio/gpio501/value
+            sleep 1
+            echo -en "\e[5;3f USB: ON  "
+        else
+            O3="0"
+            #USB power on
+            echo "0" > /sys/class/gpio/gpio501/value
+            sleep 1
+            echo -en "\e[5;3f USB: OFF  "
+        fi
+    fi
+    
+
+    if [[ "$i" == "0" ]]
+    then
+#clear screen
+        echo -en "\e[2J"
+        break
+    fi
+
+done
+
+#12V power off
+echo "0" > /sys/class/gpio/gpio500/value
+#5V power off
+echo "0" > /sys/class/gpio/gpio502/value
+#USB power off
+echo "0" > /sys/class/gpio/gpio501/value

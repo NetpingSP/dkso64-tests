@@ -1,0 +1,7 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+
+/bin/echo mcp23017 0x20 > /sys/bus/i2c/devices/i2c-0/new_device
+/bin/echo pcf8563 0x51 > /sys/bus/i2c/devices/i2c-0/new_device
+      
+exit 0

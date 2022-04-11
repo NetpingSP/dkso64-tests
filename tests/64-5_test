@@ -1,0 +1,105 @@
+#!/bin/sh
+
+
+#SECOND_P   gpio503
+#V1_PG      gpio40
+#V2_PG      gpio39
+
+
+#GPIO ext init
+if test ! -d "/sys/class/gpio/gpiochip496";
+then
+    echo "Need init ext GPIO chip"
+    echo "mcp23017 0x20" > /sys/bus/i2c/devices/i2c-0/new_device
+fi
+
+#GPIO init
+if test ! -d "/sys/class/gpio/gpio503";
+then
+    echo "Init GPIO5503"
+    echo "503" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio39";
+then
+    echo "Init GPIO39"
+    echo "39" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio40";
+then
+    echo "Init GPIO40"
+    echo "40" > /sys/class/gpio/export
+fi
+
+#V1_PG
+echo "in" > /sys/class/gpio/gpio40/direction
+#V2_PG
+echo "in" > /sys/class/gpio/gpio39/direction
+#SECOND_P
+echo "out" > /sys/class/gpio/gpio503/direction
+
+
+#SECOND_P init
+echo "0" > /sys/class/gpio/gpio503/value
+
+#clear screen
+echo -en "\e[2J"
+
+echo -en "\e[3;3f SECOND_P: 0"
+
+echo -en "\e[5;3f Press key:"
+echo -en "\e[6;3f \"1\" for switching SECOND_P"
+echo -en "\e[7;3f \"0\" to go to V_PGs test\n"
+
+O1=0
+
+while [ true ]; do
+    read -n 1 -s -r i
+
+    if [[ "$i" == "1" ]]
+    then
+        if [[ "$O1" == "0" ]]
+        then
+            O1="1"
+            echo "1" > /sys/class/gpio/gpio503/value
+            echo -en "\e[3;3f SECOND_P: 1"
+        else
+            O1="0"
+            echo "0" > /sys/class/gpio/gpio503/value
+            echo -en "\e[3;3f SECOND_P: 0"
+        fi
+    fi
+
+    if [[ "$i" == "0" ]]
+    then
+        break
+    fi
+
+done
+
+
+#clear screen
+echo -en "\e[2J"
+
+echo -en "\e[3;3f V1_PG:    0"
+echo -en "\e[4;3f V2_PG:    0"
+
+echo -en "\e[6;3f Press key \"0\" for exit from test\n"
+i="1"
+
+while [ true ]; do
+    read -t 1 -n 1 -s -r i
+    echo -en "\e[3;3f V1_PG:    "; cat /sys/class/gpio/gpio40/value
+    echo -en "\e[4;3f V2_PG:    "; cat /sys/class/gpio/gpio39/value
+    if [[ "$i" == "0" ]]
+    then
+        break
+    fi
+
+done
+
+#clear screen
+echo -en "\e[2J"
+
+#SECOND_P init
+echo "0" > /sys/class/gpio/gpio503/value
+

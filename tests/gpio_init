@@ -1,0 +1,102 @@
+#!/bin/sh
+
+echo "116" > /sys/class/gpio/export
+echo "77" > /sys/class/gpio/export
+echo "78" > /sys/class/gpio/export
+echo "117" > /sys/class/gpio/export
+echo "137" > /sys/class/gpio/export
+echo "133" > /sys/class/gpio/export
+echo "69" > /sys/class/gpio/export
+echo "out" > /sys/class/gpio/gpio116/direction
+echo "out" > /sys/class/gpio/gpio77/direction
+echo "out" > /sys/class/gpio/gpio78/direction
+echo "out" > /sys/class/gpio/gpio117/direction
+echo "out" > /sys/class/gpio/gpio137/direction
+echo "out" > /sys/class/gpio/gpio69/direction
+
+echo "out" > /sys/class/gpio/gpio133/direction
+echo "1" > /sys/class/gpio/gpio133/value
+
+echo "in" > /sys/class/gpio/gpio133/direction
+echo "0" > /sys/class/gpio/gpio116/value
+echo "0" > /sys/class/gpio/gpio77/value
+echo "0" > /sys/class/gpio/gpio78/value
+echo "0" > /sys/class/gpio/gpio117/value
+echo "0" > /sys/class/gpio/gpio137/value
+echo "0" > /sys/class/gpio/gpio69/value
+
+#1W
+echo "86" > /sys/class/gpio/export
+echo "85" > /sys/class/gpio/export
+echo "out" > /sys/class/gpio/gpio86/direction
+echo "in" > /sys/class/gpio/gpio85/direction
+echo "0" > /sys/class/gpio/gpio86/value
+
+
+#SPI test
+echo "121" > /sys/class/gpio/export
+echo "122" > /sys/class/gpio/export
+echo "123" > /sys/class/gpio/export
+echo "124" > /sys/class/gpio/export
+
+echo "in" > /sys/class/gpio/gpio121/direction
+echo "in" > /sys/class/gpio/gpio122/direction
+echo "in" > /sys/class/gpio/gpio123/direction
+echo "in" > /sys/class/gpio/gpio124/direction
+
+#3G
+echo "74" > /sys/class/gpio/export
+echo "27" > /sys/class/gpio/export
+echo "28" > /sys/class/gpio/export
+
+echo "out" > /sys/class/gpio/gpio74/direction
+echo "out" > /sys/class/gpio/gpio27/direction
+echo "out" > /sys/class/gpio/gpio28/direction
+
+echo "0" > /sys/class/gpio/gpio74/value
+echo "1" > /sys/class/gpio/gpio27/value
+echo "1" > /sys/class/gpio/gpio28/value
+
+
+#POWER
+echo "12" > /sys/class/gpio/export
+echo "15" > /sys/class/gpio/export
+#POWER DIRECTION
+echo "out" > /sys/class/gpio/gpio12/direction
+echo "out" > /sys/class/gpio/gpio15/direction
+#POWER STATE
+echo "0" > /sys/class/gpio/gpio12/value
+echo "0" > /sys/class/gpio/gpio15/value
+
+#IO
+echo "48" > /sys/class/gpio/export
+echo "49" > /sys/class/gpio/export
+echo "50" > /sys/class/gpio/export
+echo "51" > /sys/class/gpio/export
+echo "119" > /sys/class/gpio/export
+echo "118" > /sys/class/gpio/export
+echo "24" > /sys/class/gpio/export
+echo "25" > /sys/class/gpio/export
+echo "52" > /sys/class/gpio/export
+echo "53" > /sys/class/gpio/export
+echo "19" > /sys/class/gpio/export
+#IO DIRECTION
+echo "out" > /sys/class/gpio/gpio119/direction
+echo "out" > /sys/class/gpio/gpio118/direction
+echo "out" > /sys/class/gpio/gpio24/direction
+echo "out" > /sys/class/gpio/gpio25/direction
+echo "out" > /sys/class/gpio/gpio52/direction
+echo "out" > /sys/class/gpio/gpio53/direction
+echo "out" > /sys/class/gpio/gpio19/direction
+echo "in" > /sys/class/gpio/gpio48/direction
+echo "in" > /sys/class/gpio/gpio49/direction
+echo "in" > /sys/class/gpio/gpio50/direction
+echo "in" > /sys/class/gpio/gpio51/direction
+#IO STATE
+echo "0" > /sys/class/gpio/gpio119/value
+echo "0" > /sys/class/gpio/gpio118/value
+echo "0" > /sys/class/gpio/gpio24/value
+echo "0" > /sys/class/gpio/gpio25/value
+echo "0" > /sys/class/gpio/gpio52/value
+echo "0" > /sys/class/gpio/gpio53/value
+echo "0" > /sys/class/gpio/gpio19/value

@@ -1,0 +1,42 @@
+#!/bin/sh
+
+#GPIO init
+
+if test ! -d "/sys/class/gpio/gpio17";
+then
+    echo "Need init GPIO17"
+    echo "17" > /sys/class/gpio/export
+fi
+
+#DEFAULT
+echo "in" > /sys/class/gpio/gpio17/direction
+
+#clear screen
+echo -en "\e[2J"
+
+echo -en "\e[3;3f Press button DEFAULT on DKST 64 for 3 seconds"
+echo -en "\e[4;3f Press key \"0\" for exit from test\n"
+i="1"
+
+def=1
+
+while [ true ]; do
+    read -t 1 -n 1 -s -r i
+    
+    #read signal
+    def=$(cat /sys/class/gpio/gpio17/value)
+    sleep 1
+
+    if [[ "$i" == "0" || "$def" == "0" ]]
+    then
+        break
+    fi
+done
+
+if [[ "$def" == "0" ]]
+then
+    echo -en "\e[5;3f Test passed \n\n"
+else
+    echo -en "\e[5;3f Test failed \n\n"
+fi
+

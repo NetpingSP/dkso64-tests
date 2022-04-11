@@ -1,0 +1,34 @@
+#!/bin/sh
+#clear screen
+echo -en "\e[2J"
+
+echo -en "Initializing network..\n\n"
+cp /etc/config/network network_orig
+cp network_test /etc/config/network
+/etc/init.d/network restart
+
+sleep 5
+
+echo -en "\nSet PC's IP address to 192.168.0.10!"
+echo -en "\nConnect ethernet cable to LAN socket and press any key\n\n"
+
+#wait for keypress
+read -n 1 -s -r
+
+sleep 1
+echo -en "\n\nTesting.."
+ping -c 3 -I eth0 192.168.0.10 > /dev/null
+stat=$?
+echo "$stat"
+
+if [[ $stat -eq 0 ]]
+then
+    echo "Test LAN passed"
+else
+    echo "Test LAN failed"
+fi
+
+echo -en "\n\nDeinitializing network.."
+cp network_orig /etc/config/network
+/etc/init.d/network restart
+echo "Done!"

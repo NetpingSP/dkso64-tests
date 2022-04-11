@@ -1,0 +1,103 @@
+#!/bin/sh
+
+#kill process OWFS if any
+OW_PID=pgrep owfs
+kill $OW_PID
+
+#GPIO ext init
+if test ! -d "/sys/class/gpio/gpiochip496";
+then
+    echo "Need init ext GPIO chip"
+    echo "mcp23017 0x20" > /sys/bus/i2c/devices/i2c-0/new_device
+fi
+
+if test ! -d "/dev/misc/rtc";
+then
+    echo "Need init RTC chip"
+    echo "pcf8563 0x51" > /sys/bus/i2c/devices/i2c-0/new_device
+fi
+
+
+#GPIO init
+if test ! -d "/sys/class/gpio/gpio500";
+then
+    echo "Need init GPIO500"
+    echo "500" > /sys/class/gpio/export
+fi
+if test ! -d "/sys/class/gpio/gpio502";
+then
+    echo "Need init GPIO502"
+    echo "502" > /sys/class/gpio/export
+fi
+
+#EN_OUT5
+echo "out" > /sys/class/gpio/gpio502/direction
+#ON
+echo "1" > /sys/class/gpio/gpio502/value
+
+#EN_OUT12
+echo "out" > /sys/class/gpio/gpio500/direction
+#ON
+echo "1" > /sys/class/gpio/gpio500/value
+
+i2cdetect -y 0
+
+owfs -c /root/owfs.conf
+
+sleep 5
+
+#clear screen
+echo -en "\e[2J"
+
+echo -en "\e[3;3f Sensors"
+echo -en "\e[3;40f Cycles:"
+echo -en "\e[4;40f CRC16_errors:"
+echo -en "\e[5;40f CRC8_errors:"
+
+j=0
+count=3
+
+while [ $count -gt 0 ]; do
+    str=4
+    a=0
+    sens=$(ls /root/1wire | grep "28")
+    set -- "${sens:0:15}" "${sens:16:15}" "${sens:32:15}" "${sens:48:15}" "${sens:64:15}"
+    for i; do
+        if [[ "$i" != "" ]]                     
+        then                                    
+                temp=$(cat "/root/1wire/$i/temperature")
+                echo -en "\e[$str;0f                                "
+                echo -en "\e[$str;0f $i temp: $temp"
+                str=$(( $str + 1 ))
+                a=$(( $a + 1 ))
+        fi
+    done
+
+    if [[ "$a" == "0" ]]
+    then
+        echo -en "\e[8;3f Test FAILED     "
+    else
+        echo -en "\e[8;3f Test PASSED     "
+    fi
+
+    CRC8_ERR=$(cat /root/1wire/statistics/errors/CRC8_errors)
+
+    CRC16_ERR=$(cat /root/1wire/statistics/errors/CRC16_errors)
+
+    RTC_TIME=$(hwclock)
+
+    j=$(( $j + 1 ))
+    count=$(( $count - 1 ))
+    echo -en "\e[3;54f $count"
+    echo -en "\e[4;54f $CRC16_ERR"
+    echo -en "\e[5;54f $CRC8_ERR"
+    echo -en "\e[18;0f $RTC_TIME"
+
+    sleep 1
+done
+
+echo -en "\r\n"
+
+#OFF
+echo "0" > /sys/class/gpio/gpio502/value
+echo "0" > /sys/class/gpio/gpio500/value
