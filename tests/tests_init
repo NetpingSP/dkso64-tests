@@ -2,4 +2,9 @@
 
 opkg update
 opkg install python3-pip
-pip3 install pyserial
+pip3 install pyserial crc8
+
+#clear screen
+echo -en "\e[2J"
+echo -en "\e[3;3f Done!"
+echo -en "\e[4;0f "
